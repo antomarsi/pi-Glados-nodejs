@@ -7,17 +7,6 @@ class Robot {
     }
 
     appRoutes() {
-        const led = new this.gpio(13, { mode: this.gpio.OUTPUT });
-        let dutyCycle = 0;
-        
-        // setInterval(function() {
-        //     led.pwmWrite(dutyCycle);
-        
-        //     dutyCycle += 50;
-        //     if (dutyCycle > 255) {
-        //         dutyCycle = 0;
-        //     }
-        // }, 500);
         
     }
 

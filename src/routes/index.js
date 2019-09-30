@@ -9,7 +9,6 @@ class Routes {
     }
 
     appRoutes() {
-
         this.app.get('/', (request, response) => {
             res.json({message: 'Hello World'});
         });

@@ -1,19 +1,20 @@
 import detectWebcamFace from "../utils/WebcamDetect";
 import opencvHelpers from "../utils/OpencvHelpers";
+import { Router } from "express";
 
 class Routes {
 
-    constructor(app, socket) {
-        this.app = app;
+    constructor(socket) {
         this.io = socket;
     }
 
     appRoutes() {
-        this.app.get('/', (request, response) => {
+        const router = Router();
+        router.get('/', (request, response) => {
             res.json({message: 'Hello World'});
         });
 
-        this.app.get('/detect-faces', (request, response) => {
+        router.get('/detect-faces', (request, response) => {
             opencvHelpers.detectFace()
                 .then((result) => {
                     response.statusCode = 200;
@@ -25,6 +26,7 @@ class Routes {
                     response.end();
                 });
         });
+        return router;
     }
 
     socketEvents() {
@@ -38,8 +40,8 @@ class Routes {
     }
 
     routesConfig() {
-        this.appRoutes();
         this.socketEvents();
+        return this.appRoutes();
     }
 }
 

@@ -1,14 +1,15 @@
 
 class Motor {
-    deg_0_pulse = 0.5
-    deg_180_pulse = 2.5
-    f = 50.0
+
     constructor(gpio, pin, options) {
         this.motor = new gpio(pin, { mode: gpio.OUTPUT })
-        period = 1000 / f
-        k = 100 / period
-        this.deg_0_duty = deg_0_pulse * k
-        pulse_range = deg_180_pulse - deg_0_pulse
+        this.deg_0_pulse = 0.5
+        this.deg_180_pulse = 2.5
+        let f = 50.0
+        let period = 1000 / f
+        let k = 100 / period
+        this.deg_0_duty = this.deg_0_pulse * k
+        let pulse_range = this.deg_180_pulse - this.deg_0_pulse
         this.duty_range = pulse_range * k
     }
 
@@ -16,7 +17,7 @@ class Motor {
         if (angle < 0 || angle > 180) {
             throw new Error("invalid");
         }
-        duty = deg_0_duty + (angle / 180.0) * duty_range;
+        let duty = this.deg_0_duty + (angle / 180.0) * this.duty_range;
         this.motor.servoWrite(duty);
         this.angle = angle;
     }
@@ -30,9 +31,11 @@ class Motor {
 
 class ArmControl {
     constructor(pigpio) {
-        this.gpio = pigpio.Gpio;
-        this.ServoBase = new Motor(gpio, 10);
-        this.ServoHead = new Motor(gpio, 13);
+        this.gpio = pigpio;
+        this.ServoBase = new Motor(this.gpio, 10);
+        this.ServoHead = new Motor(this.gpio, 13);
+        console.log("Started ArmControl");
+        this.ResetAngle();
     }
 
     ResetAngle() {
@@ -40,17 +43,17 @@ class ArmControl {
         this.ServoHead.ResetAngle();
     }
 
-    MoveRight() {
-
+    MoveRight(value) {
+        this.ServoHead.SetAngle(this.ServoHead.GetAngle() + value)
     }
-    MoveLeft() {
-
+    MoveLeft(value) {
+        this.ServoHead.SetAngle(this.ServoHead.GetAngle() - value)
     }
     MoveUp() {
-
+        this.ServoBase.SetAngle(this.ServoHead.GetAngle() + value)
     }
     MoveDown() {
-
+        this.ServoBase.SetAngle(this.ServoHead.GetAngle() - value)
     }
 }
 

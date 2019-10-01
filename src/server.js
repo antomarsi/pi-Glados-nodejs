@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import socketio from 'socket.io';
 import path from "path";
 import routes from "./routes";
-import robot from "./robot";
+import Robot from "./robot";
 
 class Server {
     constructor() {
@@ -18,18 +18,17 @@ class Server {
         this.app = express();
         this.http = http.Server(this.app);
         this.socket = socketio(this.http);
+        this.robot = new Robot(this.socket, this.pigpio);
     }
 
     appConfig() {
-        this.app.use(
-            bodyParser.json()
-        );
+        this.app.use(bodyParser.json());
         this.app.use(express.static(path.join('data')));
     }
 
     includeRoutes() {
-        new routes(this.app, this.socket).routesConfig();
-        new robot(this.app, this.socket, this.pigpio).robotConfig();
+        this.app.use("/api", new routes(this.socket).routesConfig());
+        this.app.use("/robot", this.robot.robotConfigRoutes());
     }
 
     listen() {
@@ -39,6 +38,8 @@ class Server {
 
         this.http.listen(this.port, this.host, () => {
             console.log(`Listening on http://${this.host}:${this.port}`);
+            console.log("Starting Robot Process");
+            this.robot.run();
         });
     }
 }

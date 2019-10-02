@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "node --inspect=5858 -r ts-node/register ./src/index.ts",
-    "dev": "nodemon",
+    "dev": "cross-env NODE_ENV=development nodemon",
     "build": "tsc"
   },
   "keywords": [],
@@ -13,7 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cross-env": "^6.0.2",
     "express": "^4.16.4",
+    "opencv4nodejs": "^5.3.0",
     "pigpio-mock": "^0.0.1",
     "socket.io": "^2.3.0"
   },
@@ -29,18 +31,5 @@
     "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.6.3"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "**/*.test.ts",
-      "**/*.spec.ts",
-      ".git",
-      "node_modules"
-    ],
-    "watch": [
-      "src"
-    ],
-    "exec": "npm start",
-    "ext": "ts"
   }
 }

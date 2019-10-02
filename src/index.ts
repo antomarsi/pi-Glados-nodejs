@@ -1,10 +1,10 @@
-import * as cv from 'opencv4nodejs';
+import * as cv from "opencv4nodejs";
 
 const devicePort = 0;
 const wCap = new cv.VideoCapture(devicePort);
 
 const classifier = new cv.CascadeClassifier(cv.HAAR_FRONTALFACE_ALT2);
-const fps = 15;
+const fps = 1;
 const fpsInterval = 1000 / fps;
 
 const drawRect = (
@@ -16,23 +16,31 @@ const drawRect = (
   image.drawRectangle(rect, color, thickness, cv.LINE_4);
 };
 
-const drawAllFaces = (image: cv.Mat, numDetectionsTh = 10) => {
-  return image
-    .bgrToGrayAsync()
-    .then(grayImg => classifier.detectMultiScaleAsync(grayImg))
-    .then(({ objects, numDetections }) => {
-      objects.forEach((rect, i) => {
-        const thickness = numDetections[i] < numDetectionsTh ? 1 : 2;
-        drawRect(image, rect, new cv.Vec3(0, 255, 0), thickness);
-      });
-      return image;
-    });
+const drawAllFaces = (
+  image: cv.Mat,
+  objects: cv.Rect[],
+  numDetections: number[],
+  numDetectionsTh = 10
+) => {
+  objects.forEach((rect, i) => {
+    const thickness = numDetections[i] < numDetectionsTh ? 1 : 2;
+    drawRect(image, rect, new cv.Vec3(0, 255, 0), thickness);
+  });
+  return image;
 };
 
-setInterval(() => {
-  if (wCap)
-    wCap
-      .readAsync()
-      .then(img => drawAllFaces(img))
-      .then(img => cv.imshow("Faces", img));
-}, fpsInterval);
+let done = false;
+const delay = 10;
+while (!done) {
+  let frame = wCap.read();
+  if (frame.empty) {
+    wCap.reset();
+    frame = wCap.read();
+  }
+  let imgGrey = frame.bgrToGray();
+  let res = classifier.detectMultiScale(imgGrey);
+  let img = drawAllFaces(frame, res.objects, res.numDetections);
+  cv.imshow("Faces", img);
+  const key = cv.waitKey(delay);
+  done = key === 81;
+}
